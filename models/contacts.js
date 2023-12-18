@@ -4,7 +4,7 @@ const path = require("path");
 const uuid = require("uuid").v4;
 const fs = require("fs").promises;
 
-const contactsPath = path.join(__dirname, "/models/contacts.json");
+const contactsPath = path.join(__dirname, "/contacts.json");
 
 const listContacts = async () => {
   try {
