@@ -63,6 +63,7 @@ const addContact = async (body) => {
     const contacts = await listContacts();
 
     const requiredFields = ["name", "email", "phone"];
+
     for (const field of requiredFields) {
       if (!body[field]) {
         const error = new Error(`missing required name: ${field}`);

@@ -33,6 +33,17 @@ router.get("/:contactId", async (req, res, next) => {
 
 router.post("/", async (req, res, next) => {
   try {
+    // const requiredFields = ["name", "email", "phone"];
+
+
+    // for (const field of requiredFields) {
+    //   if (!req.body[field]) {
+    //     const error = new Error(`missing required name: ${field}`);
+    //     error.status = 400;
+    //     throw error;
+    //   }
+    // }
+
     const { error } = contactSchema.validate(req.body);
     if (error) {
       const validationError = new Error(error.details[0].message);
