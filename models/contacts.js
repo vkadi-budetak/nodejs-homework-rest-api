@@ -96,11 +96,7 @@ const addContact = async (body) => {
 
 const updateContact = async (contactId, body) => {
   try {
-    if (!body || Object.keys(body).length === 0) {
-      const error = new Error("Missing fields");
-      error.status = 400;
-      throw error;
-    }
+    
     const contacts = await listContacts();
 
     const contactIndex = contacts.findIndex(
