@@ -3,7 +3,6 @@
 const { Contact } = require("./schema");
 const { HttpError, ctrlWrapper } = require("../helpers");
 
-
 // ============================== Get All
 
 const listContacts = async (req, res) => {
