@@ -2,6 +2,12 @@ const { User } = require("./schema");
 const { HttpError, ctrlWrapper } = require("../helpers");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const gravatar = require("gravatar");
+const path = require("path");
+const fs = require("fs/promises");
+const Jimp = require("jimp");
+
+const avatarDir = path.join(__dirname, "../", "public", "avatars");
 
 // ============================== Get current User
 
@@ -24,8 +30,9 @@ const registerUser = async (req, res) => {
   }
 
   const hashPassword = await bcrypt.hash(password, 10);
+const avatarURL = gravatar.url(email);
 
-  const newUser = await User.create({ ...req.body, password: hashPassword });
+  const newUser = await User.create({ ...req.body, password: hashPassword, avatarURL });
 
   res.status(201).json({
     user: { email: newUser.email, subscription: newUser.subscription },
@@ -75,6 +82,32 @@ const updateSubscription = async (req, res) => {
   res.json(user);
 };
 
+// ============================== Update avatar
+const updateAvatar = async (req, res) => {
+  if (!req.file) {
+    throw HttpError(400, "File is not found.");
+  }
+
+  const { _id } = req.user;
+  const { path: tempUpload, originalname } = req.file;
+  const resultUpload = path.join(avatarDir, `${_id}_${originalname}`);
+
+  const image = await Jimp.read(tempUpload);
+  image
+    .autocrop()
+    .cover(250, 250, Jimp.HORIZONTAL_ALIGN_CENTER || Jimp.VERTICAL_ALIGN_MIDDLE) // resize
+    .write(tempUpload); // save
+
+  await fs.rename(tempUpload, resultUpload);
+  const avatarURL = path.join("avatars", `${_id}_${originalname}`);
+
+  await User.findByIdAndUpdate({ _id }, { avatarURL });
+
+  res.json({
+    avatarURL,
+  });
+};
+
 // ============================== Logout User
 
 const logoutUser = async (req, res) => {
@@ -90,4 +123,5 @@ module.exports = {
   loginUser: ctrlWrapper(loginUser),
   logoutUser: ctrlWrapper(logoutUser),
   updateSubscription: ctrlWrapper(updateSubscription),
+  updateAvatar: ctrlWrapper(updateAvatar),
 };
